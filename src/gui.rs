@@ -1,5 +1,5 @@
 use iced::widget::{button, Button, Checkbox, checkbox, column, Column, container, Container, pick_list, PickList, row, Row, Scrollable, scrollable, text, Text, text_input, TextInput, vertical_space};
-use iced::{alignment, executor, font, window};
+use iced::{alignment, executor, font, Subscription, widget, window};
 use iced::{Alignment, Application, Command, Element, Length, Theme};
 use iced::advanced::Widget;
 use iced_aw::{card, modal, Modal};
@@ -213,6 +213,8 @@ impl Application for TaskList {
                 Command::none()
             }
             Message::CloseOverlay => {
+                self.mem.task_name = String::new();
+                self.mem.task_desc = String::new();
                 match (&self.state, &self.button_pressed) {
                     (State::Create, Some(ButtonPressed::Create)) => {
                         self.state = State::None;
