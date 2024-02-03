@@ -70,6 +70,7 @@ struct TaskEntry {
     id: i32,
     name: String,
     description: String,
+    tags: Vec<String>,
     completed: bool,
 }
 
@@ -79,6 +80,7 @@ impl Default for TaskEntry {
             id: 0,
             name: String::default(),
             description: String::default(),
+            tags: vec![String::default()],
             completed: false,
         }
     }
@@ -101,6 +103,7 @@ struct Mem {
     search_term: String,
     search_results: Vec<TaskEntry>,
     selected_file: Option<String>,
+    task_tags: Vec<String>,
     id: i32,
     run: bool,
 }
@@ -116,6 +119,7 @@ impl Default for Mem {
             file_name: String::new(),
             list_name: "tasklist".to_string(),
             selected_file: Some("tasklist.json".to_string()),
+            task_tags: vec![String::new()],
             id: 0,
             run: false,
         }
@@ -132,6 +136,7 @@ pub enum Message{
     TaskNameEdited(String),
     TaskDescChanged(String),
     TaskDescEdited(String),
+    TagsChanged(String),
     NewFileNameChanged(String),
     TaskSubmitted,
     TaskEdited(i32),
@@ -196,6 +201,7 @@ impl Application for TaskList {
                         if let Some(task) = self.mem.task_entries.iter().find(|entry| entry.id == self.mem.editing_task_id.unwrap()) {
                             self.mem.task_name = task.name.clone();
                             self.mem.task_desc = task.description.clone();
+                            self.mem.task_tags = task.tags.clone();
                         }
                         self.state = State::Edit;
                         Some(ButtonPressed::Edit)
@@ -215,6 +221,7 @@ impl Application for TaskList {
             Message::CloseOverlay => {
                 self.mem.task_name = String::new();
                 self.mem.task_desc = String::new();
+                self.mem.task_tags.clear();
                 match (&self.state, &self.button_pressed) {
                     (State::Create, Some(ButtonPressed::Create)) => {
                         self.state = State::None;
@@ -231,7 +238,7 @@ impl Application for TaskList {
                         self.button_pressed = None;
                         Command::none()
                     }
-                    _ => panic!("Attempted to close overlay while in another mode.")
+                    _ => panic!("Attempted to close overlay while in another mode.!")
                 }
             }
             Message::TaskNameChanged(input) => {
@@ -250,6 +257,11 @@ impl Application for TaskList {
                 self.mem.task_desc = input;
                 Command::none()
             }
+            Message::TagsChanged(input) => {
+                self.mem.task_tags.clear();
+                self.mem.task_tags.push(input);
+                Command::none()
+            }
             Message::TaskSubmitted => {
                 if self.mem.id > self.mem.task_entries.len() as i32 {
                     self.mem.task_entries.resize(
@@ -258,6 +270,7 @@ impl Application for TaskList {
                             id: self.mem.id,
                             name: String::new(),
                             description: String::new(),
+                            tags: vec![String::default()],
                             completed: false,
                         }
                     );
@@ -269,6 +282,7 @@ impl Application for TaskList {
                     id: self.mem.id,
                     name: self.mem.task_name.clone(),
                     description: self.mem.task_desc.clone(),
+                    tags: vec![self.mem.task_tags.join(", ")],
                     completed: false,
                 };
                 self.mem.task_entries.push(new_entry.clone());
@@ -284,6 +298,7 @@ impl Application for TaskList {
 
                 self.mem.task_name = String::new();
                 self.mem.task_desc = String::new();
+                self.mem.task_tags.clear();
 
                 match (&self.state, &self.button_pressed) {
                     (State::Create, Some(ButtonPressed::Create)) => {
@@ -299,6 +314,7 @@ impl Application for TaskList {
                 if let Some(task) = self.mem.task_entries.iter_mut().find(|entry| entry.id == id) {
                     task.name = self.mem.task_name.clone();
                     task.description = self.mem.task_desc.clone();
+                    task.tags = self.mem.task_tags.clone();
 
                     let updated_tasks = Tasks {
                         tasks: self.mem.task_entries.clone(),
@@ -308,13 +324,14 @@ impl Application for TaskList {
 
                     self.mem.task_name = String::new();
                     self.mem.task_desc = String::new();
+                    self.mem.task_tags.clear();
 
                     match (&self.state, &self.button_pressed) {
                         (State::Edit, Some(ButtonPressed::Edit)) => {
                             self.state = State::None;
                             self.button_pressed = None;
                         },
-                        _ => println!("Attempted to close overlay while in another mode.")
+                        _ => println!("Attempted to close overlay while in another mode.?")
                     };
 
                     Command::none()
@@ -359,7 +376,7 @@ impl Application for TaskList {
                         self.state = State::None;
                         self.button_pressed = None;
                     },
-                    _ => println!("Attempted to close overlay while in another mode.")
+                    _ => println!("Attempted to close overlay while in another mode.*")
                 };
                 Command::none()
             }
@@ -405,7 +422,7 @@ impl Application for TaskList {
                     .unwrap()
                     .tasks
                     .iter()
-                    .filter(|entry| entry.name.to_lowercase().contains(&search_term) || entry.description.to_lowercase().contains(&search_term))
+                    .filter(|entry| entry.name.to_lowercase().contains(&search_term) || entry.description.to_lowercase().contains(&search_term) || entry.tags.join(", ").to_lowercase().contains(&search_term))
                     .cloned()
                     .collect();
 
@@ -422,6 +439,7 @@ impl Application for TaskList {
             .map(|(index, entry)| {
                 let name = Text::new(format!("Name: {}", &entry.name));
                 let description = Text::new(format!("Description: {}", &entry.description));
+                let tags = Text::new(format!("Tags: {}", &entry.tags.join(", ")));
 
                 let delete_button = Button::new(Text::new("Delete").horizontal_alignment(alignment::Horizontal::Center)).width(60)
                     .on_press(Message::ButtonDeletePressed(index)).style(ui_theme::button_theme());
@@ -439,7 +457,7 @@ impl Application for TaskList {
                     Row::new()
                         .align_items(Alignment::Center)
                         .spacing(100)
-                        .push(Column::new().spacing(10).push(name).push(description).width(Length::Fill))
+                        .push(Column::new().spacing(10).push(name).push(description).push(tags).width(Length::Fill))
                         .push(Column::new().push(Row::new().push(completed_box).align_items(Alignment::Center).push(button_column).spacing(5))),
                 )
                     .style(ui_theme::container_theme())
@@ -529,12 +547,17 @@ impl Application for TaskList {
                         .on_input(Message::TaskDescEdited)
                         .on_submit(Message::TaskSubmitted).style(ui_theme::text_input_theme());
 
+                    let tags_input = text_input("Tags", &self.mem.task_tags.join(","))
+                        .on_input(Message::TagsChanged)
+                        .on_submit(Message::TaskSubmitted).style(ui_theme::text_input_theme());
+
                     let ok_button = button(text("Ok").horizontal_alignment(alignment::Horizontal::Center)).on_press(Message::TaskSubmitted).style(ui_theme::button_theme());
                     let cancel_button = button(text("Cancel").horizontal_alignment(alignment::Horizontal::Center)).on_press(Message::CloseOverlay).style(ui_theme::button_theme());
 
                     let inputs = column![
                         task_name_input,
                         task_description_input,
+                        tags_input,
                         row![
                             ok_button.width(60),
                             cancel_button.width(60),
@@ -552,12 +575,18 @@ impl Application for TaskList {
                         .on_input(Message::TaskDescEdited)
                         .on_submit(Message::TaskEdited(self.mem.editing_task_id.unwrap())).style(ui_theme::text_input_theme());
 
+                    let tags_input = text_input("Tags", &self.mem.task_tags.join(","))
+                        .on_input(Message::TagsChanged)
+                        .on_submit(Message::TaskEdited(self.mem.editing_task_id.unwrap())).style(ui_theme::text_input_theme());
+
+
                     let ok_button = button(text("Ok").horizontal_alignment(alignment::Horizontal::Center)).on_press(Message::TaskEdited(self.mem.editing_task_id.unwrap())).style(ui_theme::button_theme());
                     let cancel_button = button(text("Cancel").horizontal_alignment(alignment::Horizontal::Center)).on_press(Message::CloseOverlay).style(ui_theme::button_theme());
 
                     let inputs = column![
                         task_name_input,
                         task_description_input,
+                        tags_input,
                         row![
                             ok_button.width(60),
                             cancel_button.width(60),

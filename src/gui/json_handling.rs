@@ -84,7 +84,7 @@ pub fn write_task(task_list: &Tasks, list_name: String) {
 
     for task in &task_list.tasks {
         if let Some(existing_task) = tasks.tasks.iter_mut().find(|t| t.id == task.id) {
-            if existing_task.name != task.name || existing_task.description != task.description || existing_task.completed != task.completed {
+            if existing_task.name != task.name || existing_task.description != task.description || existing_task.completed != task.completed || existing_task.tags != task.tags {
                 *existing_task = task.clone();
             }
         } else {
