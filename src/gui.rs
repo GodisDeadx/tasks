@@ -438,7 +438,7 @@ impl Application for TaskList {
                         .align_items(Alignment::Center)
                         .spacing(100)
                         .push(Column::new().spacing(10).push(name).push(description).width(Length::Fill))
-                        .push(Row::new().push(completed_box).push(button_column).spacing(5)),
+                        .push(Column::new().push(Row::new().push(completed_box).align_items(Alignment::Center).push(button_column).spacing(5))),
                 )
                     .style(ui_theme::container_theme())
                     .width(Length::Fill)
@@ -460,7 +460,7 @@ impl Application for TaskList {
 
         let underlay = match self.state {
             State::None => {
-                let files_result = json_handling::get_files("your_directory_path_here"); // Replace with the actual directory path
+                let files_result = json_handling::get_files("");
                 let pick_list = match files_result {
                     Ok(file_names) => {
                         pick_list(
