@@ -1,9 +1,9 @@
 mod gui;
 
+use dirs::home_dir;
+use iced::{window, Application, Settings};
 use std::path::PathBuf;
 use std::process::exit;
-use dirs::home_dir;
-use iced::{Application, Settings, window};
 
 use crate::gui::json_handling;
 
@@ -33,12 +33,17 @@ fn hide_console() {
 use iced::window::icon::from_file;
 
 fn main() -> iced::Result {
+    let mut icon_path = json_handling::get_path("img/icon.png");
+    //#[cfg(target_os = "windows")]
+    //icon_path = json_handling::get_path("img\\icon.png");
 
-    let icon_path = json_handling::get_path("img\\icon.png");
     let icon = from_file(icon_path).unwrap();
 
     let window_position: json_handling::WindowPosition = match json_handling::read_settings() {
-        Ok(settings) => json_handling::WindowPosition { x: settings.x, y: settings.y },
+        Ok(settings) => json_handling::WindowPosition {
+            x: settings.x,
+            y: settings.y,
+        },
         Err(_) => json_handling::WindowPosition { x: 100, y: 100 },
     };
 
