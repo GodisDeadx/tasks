@@ -33,9 +33,10 @@ fn hide_console() {
 use iced::window::icon::from_file;
 
 fn main() -> iced::Result {
-    let mut icon_path = json_handling::get_path("img/icon.png");
-    //#[cfg(target_os = "windows")]
-    //icon_path = json_handling::get_path("img\\icon.png");
+    #[cfg(target_os = "linux")]
+    let icon_path = json_handling::get_path("img/icon.png");
+    #[cfg(target_os = "windows")]
+    let icon_path = json_handling::get_path("img\\icon.png");
 
     let icon = from_file(icon_path).unwrap();
 
