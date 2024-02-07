@@ -1,21 +1,23 @@
-use std::rc::Rc;
-use iced::{Background, BorderRadius, Color};
-use iced::theme::Container as ThemeContainer;
-use iced::theme::Scrollable as ThemeScrollable;
 use iced::theme::Button as ThemeButton;
-use iced::theme::TextInput as ThemeTextInput;
-use iced::theme::PickList as ThemePickList;
 use iced::theme::Checkbox as ThemeCheckbox;
+use iced::theme::Container as ThemeContainer;
 use iced::theme::Menu as ThemeMenu;
-use iced_style::menu::{Appearance as MenuAppearance, StyleSheet as MenuStyleSheet};
+use iced::theme::PickList as ThemePickList;
+use iced::theme::Scrollable as ThemeScrollable;
+use iced::theme::TextInput as ThemeTextInput;
 use iced::widget::scrollable::StyleSheet as ThemeScrollableStyleSheet;
+use iced::{Background, BorderRadius, Color};
+use iced_style::menu::{Appearance as MenuAppearance, StyleSheet as MenuStyleSheet};
+use std::rc::Rc;
 
-use iced::widget::container::{Appearance as ContainerAppearance, StyleSheet};
-use iced::widget::scrollable::{Scrollbar, Scroller};
 use iced::widget::button::{Appearance as ButtonAppearance, StyleSheet as ButtonStyleSheet};
-use iced::widget::text_input::{Appearance as TextInputAppearance, StyleSheet as TextInputStyleSheet};
-use iced::widget::pick_list::{Appearance as PickListAppearance, StyleSheet as PickListStyleSheet};
 use iced::widget::checkbox::{Appearance as CheckboxAppearance, StyleSheet as CheckboxStyleSheet};
+use iced::widget::container::{Appearance as ContainerAppearance, StyleSheet};
+use iced::widget::pick_list::{Appearance as PickListAppearance, StyleSheet as PickListStyleSheet};
+use iced::widget::scrollable::{Scrollbar, Scroller};
+use iced::widget::text_input::{
+    Appearance as TextInputAppearance, StyleSheet as TextInputStyleSheet,
+};
 
 #[derive(Debug, Clone)]
 enum ThemeType {
@@ -76,11 +78,23 @@ impl StyleSheet for ContainerTheme {
         let green = 6.7 / 255.0;
         let blue = 6.7 / 255.0;
 
-        appearance.background = Some(Background::Color(Color::from_rgb(
-            red + 0.1,
-            green + 0.1,
-            blue + 0.1,
-        )));
+        #[cfg(target_os = "linux")]
+        {
+            appearance.background = Some(Background::Color(Color::from_rgb(
+                red + 0.2,
+                green + 0.2,
+                blue + 0.2,
+            )));
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            appearance.background = Some(Background::Color(Color::from_rgb(
+                red + 0.1,
+                green + 0.1,
+                blue + 0.1,
+            )));
+        }
         appearance
     }
 }
@@ -96,7 +110,6 @@ impl ButtonStyleSheet for ButtonTheme {
     type Style = iced::Theme;
 
     fn active(&self, style: &Self::Style) -> ButtonAppearance {
-
         let r = 73.3 / 100.0;
         let g = 15.7 / 100.0;
         let b = 68.6 / 100.0;
@@ -117,7 +130,11 @@ impl ButtonStyleSheet for ButtonTheme {
         let b = 68.6 / 100.0;
         let mut appearance = ButtonAppearance {
             border_radius: BorderRadius::from(2.0),
-            background: Some(Background::Color(Color::from_rgb(r + 0.2, g + 0.2, b + 0.2))),
+            background: Some(Background::Color(Color::from_rgb(
+                r + 0.2,
+                g + 0.2,
+                b + 0.2,
+            ))),
             text_color: Color::from_rgb(0.8, 0.8, 0.8),
             ..ButtonAppearance::default()
         };
@@ -126,14 +143,17 @@ impl ButtonStyleSheet for ButtonTheme {
     }
 
     fn pressed(&self, style: &Self::Style) -> ButtonAppearance {
-
         let r = 73.3 / 100.0;
         let g = 15.7 / 100.0;
         let b = 68.6 / 100.0;
 
         let mut appearance = ButtonAppearance {
             border_radius: BorderRadius::from(2.0),
-            background: Some(Background::Color(Color::from_rgb(r + 0.3, g + 0.3, b + 0.3))),
+            background: Some(Background::Color(Color::from_rgb(
+                r + 0.3,
+                g + 0.3,
+                b + 0.3,
+            ))),
             ..ButtonAppearance::default()
         };
 
@@ -201,7 +221,9 @@ impl TextInputStyleSheet for InputTheme {
 struct CheckboxTheme;
 
 pub fn checkbox_theme() -> ThemeCheckbox {
-    ThemeCheckbox::Custom(Box::new(CheckboxTheme) as Box<dyn CheckboxStyleSheet<Style = iced::Theme>>)
+    ThemeCheckbox::Custom(
+        Box::new(CheckboxTheme) as Box<dyn CheckboxStyleSheet<Style = iced::Theme>>
+    )
 }
 
 impl CheckboxStyleSheet for CheckboxTheme {
@@ -257,10 +279,9 @@ impl MenuStyleSheet for MenuTheme {
             border_color: Color::from_rgb(0.5, 0.5, 0.5),
             text_color: Color::from_rgb(0.8, 0.8, 0.8),
             selected_text_color: Color::from_rgb(0.8, 0.8, 0.8),
-            selected_background: Background::Color(Color::from_rgb(r,g,b)),
+            selected_background: Background::Color(Color::from_rgb(r, g, b)),
         }
     }
-
 }
 
 pub fn pick_list_theme() -> ThemePickList {
@@ -291,7 +312,7 @@ impl PickListStyleSheet for PickListTheme {
         let r = 73.3 / 100.0;
         let g = 15.7 / 100.0;
         let b = 68.6 / 100.0;
-        PickListAppearance{
+        PickListAppearance {
             background: Background::Color(Color::from_rgb(0.4, 0.4, 0.4)),
             border_radius: BorderRadius::from(2.0),
             border_width: 0.4,
