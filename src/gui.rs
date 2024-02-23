@@ -643,96 +643,110 @@ impl Application for TaskList {
                     let task_name_input = text_input("Name", &self.mem.task_name)
                         .on_input(Message::TaskNameChanged)
                         .on_submit(Message::TaskSubmitted)
-                        .style(ui_theme::text_input_theme());
+                        .style(ui_theme::text_input_theme())
+                        .width(Length::Fill);
 
                     let task_description_input = text_input("Description", &self.mem.task_desc)
                         .on_input(Message::TaskDescEdited)
                         .on_submit(Message::TaskSubmitted)
-                        .style(ui_theme::text_input_theme());
+                        .style(ui_theme::text_input_theme())
+                        .width(Length::Fill);
 
                     let tags_input = text_input("Tags", &self.mem.task_tags.join(","))
                         .on_input(Message::TagsChanged)
                         .on_submit(Message::TaskSubmitted)
-                        .style(ui_theme::text_input_theme());
+                        .style(ui_theme::text_input_theme())
+                        .width(Length::Fill);
 
                     let ok_button =
                         button(text("Ok").horizontal_alignment(alignment::Horizontal::Center))
                             .on_press(Message::TaskSubmitted)
-                            .style(ui_theme::button_theme());
+                            .style(ui_theme::button_theme())
+                            .width(Length::Fill);
+
                     let cancel_button =
                         button(text("Cancel").horizontal_alignment(alignment::Horizontal::Center))
                             .on_press(Message::CloseOverlay)
-                            .style(ui_theme::button_theme());
+                            .style(ui_theme::button_theme())
+                            .width(Length::Fill);
 
-                    let inputs = column![
+                    let input = column![
                         task_name_input,
                         task_description_input,
                         tags_input,
-                        row![ok_button.width(60), cancel_button.width(60),].spacing(10),
+                        row![ok_button, cancel_button].spacing(10),
                     ]
                     .spacing(10);
 
-                    inputs
+                    input
                 }
                 ButtonPressed::Edit => {
                     let task_name_input = text_input("Name", &self.mem.task_name)
                         .on_input(Message::TaskNameEdited)
                         .on_submit(Message::TaskEdited(self.mem.editing_task_id.unwrap()))
-                        .style(ui_theme::text_input_theme());
+                        .style(ui_theme::text_input_theme())
+                        .width(Length::Fill);
 
                     let task_description_input = text_input("Description", &self.mem.task_desc)
                         .on_input(Message::TaskDescEdited)
                         .on_submit(Message::TaskEdited(self.mem.editing_task_id.unwrap()))
-                        .style(ui_theme::text_input_theme());
+                        .style(ui_theme::text_input_theme())
+                        .width(Length::Fill);
 
                     let tags_input = text_input("Tags", &self.mem.task_tags.join(","))
                         .on_input(Message::TagsChanged)
                         .on_submit(Message::TaskEdited(self.mem.editing_task_id.unwrap()))
-                        .style(ui_theme::text_input_theme());
+                        .style(ui_theme::text_input_theme())
+                        .width(Length::Fill);
 
                     let ok_button =
                         button(text("Ok").horizontal_alignment(alignment::Horizontal::Center))
                             .on_press(Message::TaskEdited(self.mem.editing_task_id.unwrap()))
-                            .style(ui_theme::button_theme());
+                            .style(ui_theme::button_theme())
+                            .width(Length::Fill);
+
                     let cancel_button =
                         button(text("Cancel").horizontal_alignment(alignment::Horizontal::Center))
                             .on_press(Message::CloseOverlay)
-                            .style(ui_theme::button_theme());
+                            .style(ui_theme::button_theme())
+                            .width(Length::Fill);
 
-                    let inputs = column![
+                    let input = column![
                         task_name_input,
                         task_description_input,
                         tags_input,
-                        row![ok_button.width(60), cancel_button.width(60),].spacing(10),
+                        row![ok_button, cancel_button].spacing(10),
                     ]
                     .spacing(10);
 
-                    inputs
+                    input
                 }
                 ButtonPressed::NewFile => {
                     let list_name_input = text_input("List Name", &self.mem.file_name)
                         .on_input(Message::NewFileNameChanged)
                         .on_submit(Message::CreateNewFile)
-                        .style(ui_theme::text_input_theme());
+                        .style(ui_theme::text_input_theme())
+                        .width(Length::Fill);
 
                     let ok_button =
                         button(text("Ok").horizontal_alignment(alignment::Horizontal::Center))
                             .on_press(Message::CreateNewFile)
-                            .style(ui_theme::button_theme());
+                            .style(ui_theme::button_theme())
+                            .width(Length::Fill);
+
                     let cancel_button =
                         button(text("Cancel").horizontal_alignment(alignment::Horizontal::Center))
                             .on_press(Message::CloseOverlay)
-                            .style(ui_theme::button_theme());
+                            .style(ui_theme::button_theme())
+                            .width(Length::Fill);
 
                     let button_row = Row::new()
-                        .push(ok_button.width(Length::from(60)))
-                        .push(cancel_button.width(Length::from(60)))
+                        .push(ok_button)
+                        .push(cancel_button)
                         .align_items(Alignment::Center)
                         .spacing(10);
 
-                    let inputs = column![list_name_input, button_row,].spacing(10);
-
-                    inputs
+                    column![list_name_input, button_row].spacing(10).into()
                 }
 
                 ButtonPressed::DeleteList => {
