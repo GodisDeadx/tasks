@@ -527,8 +527,8 @@ impl Application for TaskList {
 
                 let button_column = Column::new()
                     .align_items(Alignment::Center)
-                    .push(delete_button)
                     .push(edit_button)
+                    .push(delete_button)
                     .spacing(5);
 
                 let mut task_container = Container::new(
@@ -624,7 +624,10 @@ impl Application for TaskList {
                 .height(Length::Fill)
                 .center_x()
             }
-            _ => container(task_scrollbar.width(Length::Fill).height(Length::Fill)),
+            _ => container(task_scrollbar)
+                .padding(10)
+                .width(Length::Fill)
+                .height(Length::Fill),
         };
 
         let overlay = self.button_pressed.as_ref().map(|button_pressed| {
