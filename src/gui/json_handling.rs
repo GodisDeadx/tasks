@@ -210,7 +210,7 @@ pub fn delete_task_file(name: String) {
     fs::remove_file(&path).expect("Failed to delete file");
 }
 
-pub fn get_files(directory_path: &str) -> Result<Vec<String>, String> {
+pub fn get_files() -> Result<Vec<String>, String> {
     let path = get_path("");
     let dir = match fs::read_dir(&path) {
         Ok(dir) => dir,
@@ -223,7 +223,8 @@ pub fn get_files(directory_path: &str) -> Result<Vec<String>, String> {
             if entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
                 if let Some(file_name) = entry.file_name().to_str() {
                     if file_name != "settings.json" {
-                        file_names.push(file_name.to_string());
+                        let test = file_name.replace(".json", "");
+                        file_names.push(test.to_string());
                     }
                 }
             }
